@@ -30,7 +30,7 @@ public:
 		std::tm timetm = *std::localtime(&time);
 		std::string output;
 		std::stringstream oss;
-		oss << std::put_time(&timetm, "%c %Z") << "+" << std::chrono::duration_cast<std::chrono::milliseconds>(t.time_since_epoch()).count() % 1000 << std::endl;
+		oss << std::put_time(&timetm, "%c %Z") << "+" << std::chrono::duration_cast<std::chrono::milliseconds>(t.time_since_epoch()).count() % 1000;
 		return oss.str();
 	}
 };
