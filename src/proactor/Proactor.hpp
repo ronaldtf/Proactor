@@ -13,7 +13,9 @@
 #include <memory>
 #include <mutex>
 #include "../completionEventQueue/CompletionEventQueue.hpp"
+#include "../logger/Logger.hpp"
 #include "../observer/Observer.hpp"
+#include "../utils/Utils.hpp"
 
 using namespace proactor::completionEventQueue;
 
@@ -44,7 +46,7 @@ public:
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			}
 			if (completionEventQueue->size() > 0) {
-				Logger::log("Proactor removes  element from queue (size: " + Logger::tostr(completionEventQueue->size()) + ")...");
+				logger::Logger::log("Proactor removes  element from queue (size: " + utils::Utils::tostr(completionEventQueue->size()) + ")...");
 				std::pair<AsynchronousOperation<T>*, const unsigned int> mypair = completionEventQueue->pop();
 				observer->notify(mypair.first, mypair.second);
 			}

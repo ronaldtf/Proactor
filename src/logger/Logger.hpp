@@ -10,10 +10,12 @@
 #define LOGGER_LOGGER_HPP_
 
 #include <mutex>
-#include <ostream>
-#include <sstream>
 #include <string>
+#include <sstream>
+#include <iostream>
 #include <thread>
+
+#include "../utils/Utils.hpp"
 
 namespace proactor {
 namespace logger {
@@ -21,23 +23,23 @@ namespace logger {
 class Logger : public std::ostream {
 private:
 	static std::mutex m;
-public:
 	Logger() {};
+public:
 	static void log(const std::string &message) {
-		m.lock();
+		std::lock_guard<std::mutex> locker(m);
 		std::cout << message << std::endl << std::flush;
-		m.unlock();
 	}
-	static void log(const std::stringstream &message) {
-		m.lock();
+
+	static void log(const std::stringstream& message) {
+		std::lock_guard<std::mutex> locker(m);
 		std::cout << message.str() << std::endl << std::flush;
 		m.unlock();
 	}
-	template<typename T>
-	static std::string tostr(T t) {
-		std::stringstream os;
-		os << t;
-		return os.str();
+
+	static void log(const std::string& message, const long long operationId, const std::thread::id threadId, const std::chrono::system_clock::time_point& time) {
+		log(message + proactor::utils::Utils::tostr(operationId) +
+				" \t[thread: " + proactor::utils::Utils::tostr(threadId) + "] (" +
+				proactor::utils::Utils::dateToString(time) + ")");
 	}
 };
 std::mutex Logger::m;

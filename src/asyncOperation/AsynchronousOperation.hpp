@@ -16,47 +16,83 @@
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <thread>
 #include "../constants/Constants.hpp"
 #include "../observer/Observer.hpp"
 #include "../logger/Logger.hpp"
-
-using namespace proactor::logger;
+#include "../utils/Utils.hpp"
 
 namespace proactor {
 namespace asyncOperation {
 
+/**
+ * This class represents a generic asynchronous operation.
+ * The fact of using a template class is because the output might be of a generic type.
+ */
 template<typename T>
 class AsynchronousOperation {
 private:
-	unsigned int id;
+	/**
+	 * Operation identifier for all operations. It is incremented after each operation.
+	 * The first operation id is 1
+	 */
+	static unsigned long long operationId;
 protected:
-	static unsigned int operationId;
-	std::chrono::steady_clock::time_point tstart;
-	std::chrono::steady_clock::time_point tend;
+	/**
+	 * Operation identifier
+	 */
+	const unsigned long long opId;
+	/**
+	 * Start time
+	 */
+	std::chrono::system_clock::time_point startTime;
+	/**
+	 * End time
+	 */
+	std::chrono::system_clock::time_point endTime;
+	/**
+	 * Indicates whether the operation has being executed or not
+	 */
 	bool executed;
-	Observer<AsynchronousOperation<T> > *observer;
+	/**
+	 * Observer of this class. In this case, we implement the observer design pattern
+	 * in order to notify that the given operation has finished its execution
+	 */
+	Observer<AsynchronousOperation<T> >* observer;
+	/**
+	 * Result of the operation.
+	 */
 	T result;
-	AsynchronousOperation()  : id(++operationId), executed(false), observer(nullptr) {};
+
+	/**
+	 * Class constructor.
+	 */
+	AsynchronousOperation()  : opId(operationId++), startTime(), endTime(), executed(false), observer(NULL), result() {
+	};
+
+	/**
+	 * This method starts the execution of an operation
+	 */
 	virtual void executeOperation() = 0;
 
 public:
-	void setObserver(Observer<AsynchronousOperation<T> > *observer) {
-		Logger::log("Adding observer... \t[operation: " + Logger::tostr(id) + "]");
+	void setObserver(Observer<AsynchronousOperation<T> >* observer) {
+		proactor::logger::Logger::log("Adding observer... \t[operation: " + utils::Utils::tostr(operationId) + "]");
 		this->observer = observer;
 	};
 
 	void execute() {
-		tstart = std::chrono::steady_clock::now();
-		Logger::log("\tStarting operation " + Logger::tostr(id) + " \t[thread: " + Logger::tostr(std::this_thread::get_id()) + "]");
+		startTime = std::chrono::system_clock::now();
+		proactor::logger::Logger::log("\tStarting operation ", operationId, std::this_thread::get_id(), startTime);
 
 		// Use the template pattern
 		executeOperation();
-		const int rand_num = std::rand() % 928; // 928 as a random number as well
-		std::this_thread::sleep_for(std::chrono::milliseconds(constants::Constants::DELAY + rand_num));
+		// const int rand_num = std::rand() % 928; // 928 as a random number as well
+		//std::this_thread::sleep_for(std::chrono::milliseconds(proactor::constants::Constants::DELAY + rand_num));
 
-		tend = std::chrono::steady_clock::now();
-		Logger::log("\tFinished operation " + Logger::tostr(id) + "\t(time: " + Logger::tostr(std::chrono::duration_cast<std::chrono::milliseconds>(tend-tstart).count()) + ")");
+		endTime = std::chrono::system_clock::now();
+		proactor::logger::Logger::log("Finished operation ", operationId, std::this_thread::get_id(), endTime);
 
 		if (observer != nullptr) {
 			// Notify the observer
@@ -64,8 +100,8 @@ public:
 		}
 	};
 
-	unsigned int getId() {
-		return id;
+	const unsigned int getId() {
+		return opId;
 	};
 
 	virtual T getResult() const = 0;
@@ -73,7 +109,7 @@ public:
 };
 
 template<typename T>
-unsigned int AsynchronousOperation<T>::operationId = -1;
+unsigned long long AsynchronousOperation<T>::operationId = -1;
 
 };
 

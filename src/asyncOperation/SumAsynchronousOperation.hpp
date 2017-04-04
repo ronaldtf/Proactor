@@ -38,9 +38,8 @@ public:
 
 	void executeOperation() {
 		AsynchronousOperation<T>::result = 0;
-		for (T element: elements) {
+		for (T element: elements)
 			AsynchronousOperation<T>::result += element;
-		}
 		AsynchronousOperation<T>::executed = true;
 	}
 	T getResult() const {

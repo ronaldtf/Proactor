@@ -32,7 +32,7 @@ namespace proactor {
 namespace asyncOperationProcessor  {
 
 template <typename T>
-class AsynchronousOperationProcessor : public Observer<AsynchronousOperation<T>> {
+class AsynchronousOperationProcessor : public Observer<AsynchronousOperation<T> > {
 private:
 	size_t poolSize;
 	std::mutex lock;
@@ -51,7 +51,7 @@ public:
 		Logger::log("Finished AsynchronousOperationProcessor.");
 	};
 
-	void addOperation(const unsigned int id, AsynchronousOperation<T> *operation) {
+	void addOperation(const unsigned int id, AsynchronousOperation<T>* operation) {
 		std::unique_lock<std::mutex> locker(lock);
 		if (pool.size() == poolSize) {
 			isWaiting = true;
@@ -62,7 +62,7 @@ public:
 			}
 		}
 		operation->setObserver(this);
-		std::thread t(&AsynchronousOperation<T>::execute, operation);
+		std::thread t = std::thread(&AsynchronousOperation<T>::execute, operation);
 		t.detach();
 		pool.insert(std::pair<AsynchronousOperation<T>*,const unsigned int>(operation, id));
 	};
