@@ -77,12 +77,21 @@ protected:
 	virtual void executeOperation() = 0;
 
 public:
+	/**
+	 * Set an observer to the operation. The observer will be notified once the operation has been finished.
+	 * @see Observer
+	 */
 	void setObserver(Observer<AsynchronousOperation<T> >* observer) {
 		proactor::logger::Logger::log("Adding observer... \t[operation: " + utils::Utils::tostr(operationId) + "]");
 		this->observer = observer;
 	};
 
+	/**
+	 * This method implements the template pattern. It gets the start and end time of the operation execution
+	 * and invokes the derived "executeOperation" method from the derived class.
+	 */
 	void execute() {
+		// Set the start time
 		startTime = std::chrono::system_clock::now();
 		proactor::logger::Logger::log("\tStarting operation ", operationId, std::this_thread::get_id(), startTime);
 
@@ -91,20 +100,30 @@ public:
 		// const int rand_num = std::rand() % 928; // 928 as a random number as well
 		//std::this_thread::sleep_for(std::chrono::milliseconds(proactor::constants::Constants::DELAY + rand_num));
 
+		// Set the finish time
 		endTime = std::chrono::system_clock::now();
 		proactor::logger::Logger::log("Finished operation ", operationId, std::this_thread::get_id(), endTime);
 
-		if (observer != nullptr) {
-			// Notify the observer
+		// Notify the observer, if defined
+		if (observer != NULL)
 			observer->notify(this);
-		}
 	};
 
-	const unsigned int getId() {
+	/**
+	 * Obtain the operation identifier
+	 */
+	const unsigned int getId() const {
 		return opId;
 	};
 
+	/**
+	 * Retrieve the operation result (if exists)
+	 */
 	virtual T getResult() const = 0;
+
+	/**
+	 * Class destructor
+	 */
 	virtual ~AsynchronousOperation() {};
 };
 
