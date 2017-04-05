@@ -24,30 +24,27 @@
 #include "../logger/Logger.hpp"
 #include "../observer/Observer.hpp"
 
-using namespace proactor::logger;
-using namespace proactor::completionEventQueue;
-
 namespace proactor {
 namespace asyncOperationProcessor  {
 
 template <typename T>
-class AsynchronousOperationProcessor : public Observer<AsynchronousOperation<T> > {
+class AsynchronousOperationProcessor : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
 private:
 	size_t poolSize;
 	std::mutex lock;
 	std::condition_variable cv;
 	bool isWaiting;
 	std::unordered_map<AsynchronousOperation<T>*, const unsigned int> pool;
-	CompletionEventQueue<T> *completionEventQueue;
+	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
 public:
-	AsynchronousOperationProcessor(size_t poolSize, CompletionEventQueue<T> *completionEventQueue) :
+	AsynchronousOperationProcessor(size_t poolSize, completionEventQueue::CompletionEventQueue<T> *completionEventQueue) :
 		poolSize(poolSize), isWaiting(false), completionEventQueue(completionEventQueue) {};
 
 	virtual ~AsynchronousOperationProcessor() {
 		while (pool.size() != 0) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
-		Logger::log("Finished AsynchronousOperationProcessor.");
+		logger::Logger::log("Finished AsynchronousOperationProcessor.");
 	};
 
 	void addOperation(const unsigned int id, AsynchronousOperation<T>* operation) {
@@ -55,7 +52,7 @@ public:
 		if (pool.size() == poolSize) {
 			isWaiting = true;
 			auto cond = [](size_t a, size_t b) {return a==b;};
-			Logger::log("Wait...");
+			logger::Logger::log("Wait...");
 			if (cond(pool.size(), poolSize)) {
 				cv.wait(locker);
 			}
@@ -72,7 +69,7 @@ public:
 		pool.erase(operation);
 
 		if (isWaiting) {
-			Logger::log("Unlocking for next...");
+			logger::Logger::log("Unlocking for next...");
 			isWaiting = false;
 			cv.notify_one();
 		}

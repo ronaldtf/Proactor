@@ -8,6 +8,10 @@
 #ifndef OBSERVER_HPP_
 #define OBSERVER_HPP_
 
+namespace proactor {
+
+namespace observer {
+
 /**
  * This class is part of the Observer design pattern. It defines the interface
  * methods for the observer.
@@ -27,5 +31,8 @@ public:
 	 */
 	virtual ~Observer() {};
 };
+
+} /* namespace observer */
+} /* namespace proactor */
 
 #endif /* OBSERVER_HPP_ */

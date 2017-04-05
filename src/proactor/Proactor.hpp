@@ -17,19 +17,17 @@
 #include "../observer/Observer.hpp"
 #include "../utils/Utils.hpp"
 
-using namespace proactor::completionEventQueue;
-
 namespace proactor {
 namespace proactor {
 
 template <typename T>
 class Proactor {
 private:
-	CompletionEventQueue<T> *completionEventQueue;
-	Observer<AsynchronousOperation<T> > *observer;
+	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
+	observer::Observer<AsynchronousOperation<T> > *observer;
 	bool finish;
 public:
-	Proactor(CompletionEventQueue<T> *completionEventQueue, Observer<AsynchronousOperation<T> > *observer) :
+	Proactor(completionEventQueue::CompletionEventQueue<T> *completionEventQueue, observer::Observer<AsynchronousOperation<T> > *observer) :
 		completionEventQueue(completionEventQueue), observer(observer) , finish(false) {};
 
 	void canFinish(bool finish) {
@@ -55,7 +53,7 @@ public:
 	};
 
 	virtual ~Proactor() {
-		Logger::log("Finished Proactor.");
+		logger::Logger::log("Finished Proactor.");
 	};
 };
 

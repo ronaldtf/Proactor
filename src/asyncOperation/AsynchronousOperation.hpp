@@ -57,7 +57,7 @@ protected:
 	 * Observer of this class. In this case, we implement the observer design pattern
 	 * in order to notify that the given operation has finished its execution
 	 */
-	Observer<AsynchronousOperation<T> >* observer;
+	observer::Observer<AsynchronousOperation<T> >* observer;
 	/**
 	 * Result of the operation.
 	 */
@@ -80,7 +80,7 @@ public:
 	 * @param[in] observer	Observer of the class
 	 * @see Observer
 	 */
-	void setObserver(Observer<AsynchronousOperation<T> >* observer) {
+	void setObserver(observer::Observer<AsynchronousOperation<T> >* observer) {
 		proactor::logger::Logger::log("Adding observer... \t\t[operation: " + utils::Utils::tostr(opId) + "]");
 		this->observer = observer;
 	};

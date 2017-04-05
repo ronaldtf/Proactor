@@ -12,10 +12,8 @@
 #include "asyncOperation/SumAsynchronousOperation.hpp"
 #include "asyncOperationProcessor/AsynchronousOperationProcessor.hpp"
 #include "initiatorCompletion/InitiatorCompletion.hpp"
+#include "logger/Logger.hpp"
 #include "proactor/Proactor.hpp"
-
-using namespace proactor::asyncOperation;
-using namespace proactor::initiatorCompletion;
 
 int main(int argc, char *argv[]) {
 
@@ -27,7 +25,7 @@ int main(int argc, char *argv[]) {
 	SumAsynchronousOperation<int> *op6 = new SumAsynchronousOperation<int>(60, 61);
 
 
-	InitiatorCompletion<int> initiator;
+	proactor::initiatorCompletion::InitiatorCompletion<int> initiator;
 	initiator.processOperation(op1);
 	initiator.processOperation(op2);
 	initiator.processOperation(op3);
@@ -35,7 +33,7 @@ int main(int argc, char *argv[]) {
 	initiator.processOperation(op5);
 	initiator.processOperation(op6);
 
-	Logger::log("Done.");
+	proactor::logger::Logger::log("Done.");
 
 	return 0;
 }
