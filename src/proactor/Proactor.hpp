@@ -45,8 +45,8 @@ public:
 			}
 			if (completionEventQueue->size() > 0) {
 				logger::Logger::log("Proactor removes  element from queue (size: " + utils::Utils::tostr(completionEventQueue->size()) + ")...");
-				std::pair<asyncOperation::AsynchronousOperation<T>*, const unsigned int> mypair = completionEventQueue->pop();
-				observer->notify(mypair.first, mypair.second);
+				asyncOperation::AsynchronousOperation<T>* myoperation = completionEventQueue->pop();
+				observer->notify(myoperation, myoperation->getId());
 			}
 		}
 		std::cout <<"Proactor execution finished." << std::endl;

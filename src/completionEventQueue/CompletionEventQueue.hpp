@@ -9,7 +9,7 @@
 #ifndef COMPLETIONEVENTQUEUE_COMPLETIONEVENTQUEUE_HPP_
 #define COMPLETIONEVENTQUEUE_COMPLETIONEVENTQUEUE_HPP_
 
-#include <unordered_map>
+#include <deque>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -20,20 +20,20 @@ namespace proactor {
 namespace completionEventQueue {
 
 /**
- * This class defines the "list" (actually, it is a map) of completed events.
+ * This class defines the queue of completed events.
  */
 template <typename T>
-class CompletionEventQueue : private  std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int> {
+class CompletionEventQueue : private  std::deque<asyncOperation::AsynchronousOperation<T>*> {
 private:
 	/**
-	 * Lock to push and pop events in the list
+	 * Lock to push and pop events in the queue
 	 */
 	std::mutex mutex;
 public:
 	/**
 	 * Class constructor
 	 */
-	CompletionEventQueue() : std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int >() {
+	CompletionEventQueue() : std::deque<asyncOperation::AsynchronousOperation<T>*>() {
 	};
 
 	/**
@@ -44,26 +44,42 @@ public:
 	};
 
 	/**
-	 * Pop an operation from the completion list and remove it from the list
+	 * Pop an operation from the completion queue and remove it from the list
 	 * @return An operation from the completion list
 	 */
-	std::pair<asyncOperation::AsynchronousOperation<T>*, const unsigned int> pop() {
-		// Lock the map insertion/deletion
+	asyncOperation::AsynchronousOperation<T>* pop() {
+		// Lock the queue
 		std::lock_guard<std::mutex> locker(mutex);
-		typedef typename std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int>::iterator iterType;
-		iterType it = this->begin();
-		std::pair<asyncOperation::AsynchronousOperation<T>*, const unsigned int> p = std::make_pair(it->first, it->second);
-		this->erase(it->first);
+
+		// Get the first element
+		asyncOperation::AsynchronousOperation<T>* p = this->front();
+
+		// Remove the first element from the queue
+		this->pop_front();
+
+		// Return the retrieved first element
 		return p;
 	}
+
+	/**
+	 * Add an operation to the completion queue
+	 */
 	void push(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id) {
+		// Lock the queue
 		std::lock_guard<std::mutex> locker(mutex);
-		this->insert(std::pair<asyncOperation::AsynchronousOperation<T>*, int>(operation, id));
+		// Insert the element into the queue
+		this->push_back(operation);
 	};
 
+	/**
+	 * Get the size of the completion queue
+	 * @return	Size of the queue
+	 */
 	const size_t size() {
+		// Lock the queue
 		std::lock_guard<std::mutex> locker(mutex);
-		return std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int>::size();
+		// Return the size of the queue
+		return std::deque<asyncOperation::AsynchronousOperation<T>*>::size();
 	}
 };
 

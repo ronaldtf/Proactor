@@ -1,11 +1,7 @@
 /**
- * \file InitiatorCompletion.hpp
- * \author Ronald T. Fernandez
- * \version 1.0
- * \brief Performs the Initiator and Completion tasks:
- * - Initiator: Starts the invocation of the asynchronous operation via the asynchronous operation processor
- * and defines the completion handler.
- * - Completion: Notifies about the completion of an operation.
+ * @file InitiatorCompletion.hpp
+ * @author Ronald T. Fernandez
+ * @version 1.0
  */
 
 #ifndef INITIATORCOMPLETION_INITIATORCOMPLETION_HPP_
@@ -24,6 +20,13 @@
 namespace proactor {
 namespace initiatorCompletion {
 
+/**
+ * This class performs the Initiator and Completion tasks:
+ * - Initiator: Starts the invocation of the asynchronous operation via the asynchronous operation processor
+ * and defines the completion handler.
+ * - Completion: Notifies about the completion of an operation.
+ *
+ */
 template <typename T>
 class InitiatorCompletion : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
 private:
