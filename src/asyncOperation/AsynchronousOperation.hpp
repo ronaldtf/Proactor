@@ -97,8 +97,6 @@ public:
 
 		// Use the template pattern
 		executeOperation();
-		// const int rand_num = std::rand() % 928; // 928 as a random number as well
-		//std::this_thread::sleep_for(std::chrono::milliseconds(proactor::constants::Constants::DELAY + rand_num));
 
 		// Set the finish time
 		endTime = std::chrono::system_clock::now();
