@@ -21,7 +21,6 @@
 #include <unordered_map>
 #include "../asyncOperation/AsynchronousOperation.hpp"
 #include "../completionEventQueue/CompletionEventQueue.hpp"
-#include "../constants/Constants.hpp"
 #include "../logger/Logger.hpp"
 #include "../observer/Observer.hpp"
 
@@ -46,7 +45,7 @@ public:
 
 	virtual ~AsynchronousOperationProcessor() {
 		while (pool.size() != 0) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(constants::Constants::SHORT_SLEEP));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		Logger::log("Finished AsynchronousOperationProcessor.");
 	};

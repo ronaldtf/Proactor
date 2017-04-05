@@ -18,7 +18,6 @@
 #include <iostream>
 #include <memory>
 #include <thread>
-#include "../constants/Constants.hpp"
 #include "../observer/Observer.hpp"
 #include "../logger/Logger.hpp"
 #include "../utils/Utils.hpp"

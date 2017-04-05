@@ -17,7 +17,6 @@
 
 #include "../asyncOperationProcessor/AsynchronousOperationProcessor.hpp"
 #include "../completionEventQueue/CompletionEventQueue.hpp"
-#include "../constants/Constants.hpp"
 #include "../logger/Logger.hpp"
 #include "../proactor/Proactor.hpp"
 #include "../utils/Utils.hpp"
@@ -47,10 +46,10 @@ public:
 		t = std::async(std::launch::async, &Proactor<T>::exec, std::ref(proactor));
 	};
 	virtual ~InitiatorCompletion() {
-		std::this_thread::sleep_for(std::chrono::milliseconds(constants::Constants::WAIT_FINISH));
+		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 		while (completionEventQueue->size() != 0) {
 			logger::Logger::log("Waiting for last elements...: " + utils::Utils::tostr(completionEventQueue->size()));
-			std::this_thread::sleep_for(std::chrono::milliseconds(constants::Constants::SHORT_SLEEP));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 			continue;
 		}
 		proactor->canFinish(true);
