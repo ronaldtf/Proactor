@@ -1,8 +1,8 @@
 /**
- * \file AsynchronousOperation.hpp
- * \author Ronald T. Fernandez
- * \version 1.0
- * \brief : Operation that needs to be executed (service).
+ * @file AsynchronousOperation.hpp
+ * @author Ronald T. Fernandez
+ * @version 1.0
+ * @brief : Operation that needs to be executed (service).
  * Its execution might take long (this is not a problem as the response will be returned asynchronously
  * to the entity that asked for it). In this case, it simply notifies the observer (if present).
  */
@@ -35,7 +35,6 @@ class AsynchronousOperation {
 private:
 	/**
 	 * Operation identifier for all operations. It is incremented after each operation.
-	 * The first operation id is 1
 	 */
 	static unsigned long long operationId;
 protected:
@@ -68,7 +67,7 @@ protected:
 	/**
 	 * Class constructor.
 	 */
-	AsynchronousOperation()  : opId(operationId++), startTime(), endTime(), executed(false), observer(NULL), result() {
+	AsynchronousOperation()  : opId(++operationId), startTime(), endTime(), executed(false), observer(NULL), result() {
 	};
 
 	/**
@@ -79,10 +78,11 @@ protected:
 public:
 	/**
 	 * Set an observer to the operation. The observer will be notified once the operation has been finished.
+	 * @param[in] observer	Observer of the class
 	 * @see Observer
 	 */
 	void setObserver(Observer<AsynchronousOperation<T> >* observer) {
-		proactor::logger::Logger::log("Adding observer... \t[operation: " + utils::Utils::tostr(operationId) + "]");
+		proactor::logger::Logger::log("Adding observer... \t[operation: " + utils::Utils::tostr(opId) + "]");
 		this->observer = observer;
 	};
 
@@ -93,14 +93,14 @@ public:
 	void execute() {
 		// Set the start time
 		startTime = std::chrono::system_clock::now();
-		proactor::logger::Logger::log("\tStarting operation ", operationId, std::this_thread::get_id(), startTime);
+		proactor::logger::Logger::log("\tStarting operation ", opId, std::this_thread::get_id(), startTime);
 
 		// Use the template pattern
 		executeOperation();
 
 		// Set the finish time
 		endTime = std::chrono::system_clock::now();
-		proactor::logger::Logger::log("Finished operation ", operationId, std::this_thread::get_id(), endTime);
+		proactor::logger::Logger::log("\tFinished operation ", opId, std::this_thread::get_id(), endTime);
 
 		// Notify the observer, if defined
 		if (observer != NULL)
@@ -126,7 +126,7 @@ public:
 };
 
 template<typename T>
-unsigned long long AsynchronousOperation<T>::operationId = -1;
+unsigned long long AsynchronousOperation<T>::operationId = 0;
 
 };
 
