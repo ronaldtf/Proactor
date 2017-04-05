@@ -67,6 +67,7 @@ public:
 	 * Run the computation over the defined elements
 	 */
 	void executeOperation() {
+		// We do not need a lock as the operation is performed by only one thread
 		AsynchronousOperation<T>::result = 0;
 		for (T element: elements)
 			AsynchronousOperation<T>::result += element;

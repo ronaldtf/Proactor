@@ -82,7 +82,7 @@ public:
 	 * @see Observer
 	 */
 	void setObserver(Observer<AsynchronousOperation<T> >* observer) {
-		proactor::logger::Logger::log("Adding observer... \t[operation: " + utils::Utils::tostr(opId) + "]");
+		proactor::logger::Logger::log("Adding observer... \t\t[operation: " + utils::Utils::tostr(opId) + "]");
 		this->observer = observer;
 	};
 
@@ -100,11 +100,10 @@ public:
 
 		// Set the finish time
 		endTime = std::chrono::system_clock::now();
-		proactor::logger::Logger::log("\tFinished operation ", opId, std::this_thread::get_id(), endTime);
-
+		proactor::logger::Logger::log("\tFinished operation ", opId, std::this_thread::get_id(), startTime, endTime);
 		// Notify the observer, if defined
 		if (observer != NULL)
-			observer->notify(this);
+			observer->notify(this, opId);
 	};
 
 	/**
