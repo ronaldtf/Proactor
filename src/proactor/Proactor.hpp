@@ -1,9 +1,7 @@
 /**
- * \file Proactor.hpp
- * \author Ronald T. Fernandez
- * \version 1.0
- * \brief This is the Proactor. Its mission is de-queueing completion events and then
- * notifying it to the IniitiatorCompletion handler.
+ * @file Proactor.hpp
+ * @author Ronald T. Fernandez
+ * @version 1.0
  */
 
 #ifndef PROACTOR_PROACTOR_HPP_
@@ -20,6 +18,10 @@
 namespace proactor {
 namespace proactor {
 
+/**
+ * This is the Proactor. Its mission is dequeuing completion events and then
+ * notifying it to the IniitiatorCompletion handler.
+ */
 template <typename T>
 class Proactor {
 private:

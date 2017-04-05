@@ -1,9 +1,7 @@
 /**
- * \file AsynchronousOperationProcessor.hpp
- * \author Ronald T. Fernandez
- * \version 1.0
- * \brief Asynchronous operation processor: Executes the asynchronous operations.
- * It generates and queues the corresponding completion events.
+ * @file AsynchronousOperationProcessor.hpp
+ * @author Ronald T. Fernandez
+ * @version 1.0
  */
 
 
@@ -27,6 +25,10 @@
 namespace proactor {
 namespace asyncOperationProcessor  {
 
+/**
+ * Asynchronous operation processor: Executes the asynchronous operations.
+ * It generates and queues the corresponding completion events.
+ */
 template <typename T>
 class AsynchronousOperationProcessor : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
 private:
