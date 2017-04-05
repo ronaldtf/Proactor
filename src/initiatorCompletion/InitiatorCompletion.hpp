@@ -25,7 +25,7 @@ namespace proactor {
 namespace initiatorCompletion {
 
 template <typename T>
-class InitiatorCompletion : public observer::Observer<AsynchronousOperation<T> > {
+class InitiatorCompletion : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
 private:
 	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
 	std::shared_ptr<asyncOperationProcessor::AsynchronousOperationProcessor<T> > asynchronousOperationProcessor;
@@ -53,12 +53,12 @@ public:
 		delete completionEventQueue;
 		logger::Logger::log("Finished InitiatorCompletion.");
 	};
-	void processOperation(AsynchronousOperation<T> *operation) {
+	void processOperation(asyncOperation::AsynchronousOperation<T> *operation) {
 		logger::Logger::log("Initiating operation... ");
 		asynchronousOperationProcessor->addOperation(clientNum, operation);
 		++clientNum;
 	};
-	void notify(AsynchronousOperation<T> *operation, const unsigned int id=0) {
+	void notify(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id=0) {
 		logger::Logger::log("Notified in Initiator/Completion - id:" +
 				utils::Utils::tostr(id) +
 				" - Result operation: " +

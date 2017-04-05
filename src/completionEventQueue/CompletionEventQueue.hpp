@@ -16,32 +16,55 @@
 
 #include "../asyncOperation/AsynchronousOperation.hpp"
 
-using namespace proactor::asyncOperation;
-
 namespace proactor {
 namespace completionEventQueue {
 
+/**
+ * This class defines the "list" (actually, it is a map) of completed events.
+ */
 template <typename T>
-class CompletionEventQueue : public std::unordered_map<AsynchronousOperation<T>*, const unsigned int> {
+class CompletionEventQueue : private  std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int> {
 private:
-	std::mutex m;
+	/**
+	 * Lock to push and pop events in the list
+	 */
+	std::mutex mutex;
 public:
-	CompletionEventQueue() : std::unordered_map<AsynchronousOperation<T>*, const unsigned int >() {};
-	virtual ~CompletionEventQueue() {
-		this->erase(this->begin(), this->end());
+	/**
+	 * Class constructor
+	 */
+	CompletionEventQueue() : std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int >() {
 	};
-	std::pair<AsynchronousOperation<T>*, const unsigned int> pop() {
-		std::unique_lock<std::mutex> locker(m);
-		typedef typename std::unordered_map<AsynchronousOperation<T>*, const unsigned int>::iterator iterType;
+
+	/**
+	 * Class destructor
+	 */
+	virtual ~CompletionEventQueue() {
+		this->clear();
+	};
+
+	/**
+	 * Pop an operation from the completion list and remove it from the list
+	 * @return An operation from the completion list
+	 */
+	std::pair<asyncOperation::AsynchronousOperation<T>*, const unsigned int> pop() {
+		// Lock the map insertion/deletion
+		std::lock_guard<std::mutex> locker(mutex);
+		typedef typename std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int>::iterator iterType;
 		iterType it = this->begin();
-		std::pair<AsynchronousOperation<T>*, const unsigned int> p = std::make_pair(it->first, it->second);
+		std::pair<asyncOperation::AsynchronousOperation<T>*, const unsigned int> p = std::make_pair(it->first, it->second);
 		this->erase(it->first);
 		return p;
 	}
-	void push(AsynchronousOperation<T> *operation, const unsigned int id) {
-		std::unique_lock<std::mutex> locker(m);
-		this->insert(std::pair<AsynchronousOperation<T>*, int>(operation, id));
+	void push(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id) {
+		std::lock_guard<std::mutex> locker(mutex);
+		this->insert(std::pair<asyncOperation::AsynchronousOperation<T>*, int>(operation, id));
 	};
+
+	const size_t size() {
+		std::lock_guard<std::mutex> locker(mutex);
+		return std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int>::size();
+	}
 };
 
 }

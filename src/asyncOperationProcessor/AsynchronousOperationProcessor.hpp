@@ -34,7 +34,7 @@ private:
 	std::mutex lock;
 	std::condition_variable cv;
 	bool isWaiting;
-	std::unordered_map<AsynchronousOperation<T>*, const unsigned int> pool;
+	std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int> pool;
 	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
 public:
 	AsynchronousOperationProcessor(size_t poolSize, completionEventQueue::CompletionEventQueue<T> *completionEventQueue) :
@@ -47,7 +47,7 @@ public:
 		logger::Logger::log("Finished AsynchronousOperationProcessor.");
 	};
 
-	void addOperation(const unsigned int id, AsynchronousOperation<T>* operation) {
+	void addOperation(const unsigned int id, asyncOperation::AsynchronousOperation<T>* operation) {
 		std::unique_lock<std::mutex> locker(lock);
 		if (pool.size() == poolSize) {
 			isWaiting = true;
@@ -58,11 +58,11 @@ public:
 			}
 		}
 		operation->setObserver(this);
-		std::thread t = std::thread(&AsynchronousOperation<T>::execute, operation);
+		std::thread t = std::thread(&asyncOperation::AsynchronousOperation<T>::execute, operation);
 		t.detach();
-		pool.insert(std::pair<AsynchronousOperation<T>*,const unsigned int>(operation, id));
+		pool.insert(std::pair<asyncOperation::AsynchronousOperation<T>*,const unsigned int>(operation, id));
 	};
-	void notify(AsynchronousOperation<T> *operation, const unsigned int id=0) {
+	void notify(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id=0) {
 		std::unique_lock<std::mutex> locker(lock);
 
 		completionEventQueue->push(operation, pool.at(operation));

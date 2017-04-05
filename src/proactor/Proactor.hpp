@@ -24,10 +24,10 @@ template <typename T>
 class Proactor {
 private:
 	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
-	observer::Observer<AsynchronousOperation<T> > *observer;
+	observer::Observer<asyncOperation::AsynchronousOperation<T> > *observer;
 	bool finish;
 public:
-	Proactor(completionEventQueue::CompletionEventQueue<T> *completionEventQueue, observer::Observer<AsynchronousOperation<T> > *observer) :
+	Proactor(completionEventQueue::CompletionEventQueue<T> *completionEventQueue, observer::Observer<asyncOperation::AsynchronousOperation<T> > *observer) :
 		completionEventQueue(completionEventQueue), observer(observer) , finish(false) {};
 
 	void canFinish(bool finish) {
@@ -45,7 +45,7 @@ public:
 			}
 			if (completionEventQueue->size() > 0) {
 				logger::Logger::log("Proactor removes  element from queue (size: " + utils::Utils::tostr(completionEventQueue->size()) + ")...");
-				std::pair<AsynchronousOperation<T>*, const unsigned int> mypair = completionEventQueue->pop();
+				std::pair<asyncOperation::AsynchronousOperation<T>*, const unsigned int> mypair = completionEventQueue->pop();
 				observer->notify(mypair.first, mypair.second);
 			}
 		}

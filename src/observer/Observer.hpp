@@ -9,7 +9,6 @@
 #define OBSERVER_HPP_
 
 namespace proactor {
-
 namespace observer {
 
 /**
