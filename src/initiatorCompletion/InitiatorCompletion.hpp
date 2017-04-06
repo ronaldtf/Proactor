@@ -30,18 +30,17 @@ namespace initiatorCompletion {
 template <typename T>
 class InitiatorCompletion : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
 private:
-	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
+	std::shared_ptr<completionEventQueue::CompletionEventQueue<T> > completionEventQueue;
 	std::shared_ptr<asyncOperationProcessor::AsynchronousOperationProcessor<T> > asynchronousOperationProcessor;
-	static unsigned int clientNum;
-	proactor::Proactor<T> *proactor;
+	std::unique_ptr<proactor::Proactor<T> > proactor;
 	std::future<void> t;
 public:
 	InitiatorCompletion() :
-		completionEventQueue(new completionEventQueue::CompletionEventQueue<T>()),
-		asynchronousOperationProcessor(std::shared_ptr<asyncOperationProcessor::AsynchronousOperationProcessor<T> >(new asyncOperationProcessor::AsynchronousOperationProcessor<T>(2, completionEventQueue))),
-		proactor(new proactor::Proactor<T>(completionEventQueue, this))
+		completionEventQueue(std::shared_ptr<completionEventQueue::CompletionEventQueue<T> >(new completionEventQueue::CompletionEventQueue<T>())),
+		asynchronousOperationProcessor(std::make_shared<asyncOperationProcessor::AsynchronousOperationProcessor<T> >(completionEventQueue)),
+		proactor(std::unique_ptr<proactor::Proactor<T> >(new proactor::Proactor<T>(completionEventQueue, this)))
 	{
-		t = std::async(std::launch::async, &proactor::Proactor<T>::exec, std::ref(proactor));
+		t = std::async(std::launch::async, &proactor::Proactor<T>::exec, proactor.get());
 	};
 	virtual ~InitiatorCompletion() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
@@ -52,14 +51,11 @@ public:
 		}
 		proactor->canFinish(true);
 		t.wait();
-		delete proactor;
-		delete completionEventQueue;
 		logger::Logger::log("Finished InitiatorCompletion.");
 	};
 	void processOperation(asyncOperation::AsynchronousOperation<T> *operation) {
 		logger::Logger::log("Initiating operation... ");
-		asynchronousOperationProcessor->addOperation(clientNum, operation);
-		++clientNum;
+		asynchronousOperationProcessor->addOperation(operation);
 	};
 	void notify(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id=0) {
 		logger::Logger::log("Notified in Initiator/Completion - id:" +
@@ -68,10 +64,6 @@ public:
 				utils::Utils::tostr(operation->getResult()));
 	};
 };
-
-
-template <typename T>
-unsigned int InitiatorCompletion<T>::clientNum = 0;
 
 } /* namespace initiatorCompletion */
 } /* namespace proactor */

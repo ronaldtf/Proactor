@@ -25,14 +25,15 @@ namespace proactor {
 template <typename T>
 class Proactor {
 private:
-	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
+	std::shared_ptr<completionEventQueue::CompletionEventQueue<T> > completionEventQueue;
 	observer::Observer<asyncOperation::AsynchronousOperation<T> > *observer;
 	bool finish;
 public:
-	Proactor(completionEventQueue::CompletionEventQueue<T> *completionEventQueue, observer::Observer<asyncOperation::AsynchronousOperation<T> > *observer) :
-		completionEventQueue(completionEventQueue), observer(observer) , finish(false) {};
+	Proactor(std::shared_ptr<completionEventQueue::CompletionEventQueue<T> > completionEventQueue, observer::Observer<asyncOperation::AsynchronousOperation<T> > *observer) :
+		completionEventQueue(completionEventQueue), observer(observer) , finish(false) {
+	};
 
-	void canFinish(bool finish) {
+	void canFinish(const bool finish) {
 		this->finish = finish;
 	}
 

@@ -71,6 +71,14 @@ public:
 		AsynchronousOperation<T>::result = 0;
 		for (T element: elements)
 			AsynchronousOperation<T>::result += element;
+
+		// Add a random time
+		// NOTE: This is only for testing purposes!!! In the real pattern, you should remove
+		// this line because it will make the pattern run slowly. However, it is added here
+		// to verify the behavior with different threads and operations
+		// (maximum sleep time: 9.999 seconds)
+		std::this_thread::sleep_for(std::chrono::milliseconds(std::rand() % 10000));
+
 		AsynchronousOperation<T>::executed = true;
 	}
 

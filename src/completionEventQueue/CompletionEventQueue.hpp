@@ -64,7 +64,7 @@ public:
 	/**
 	 * Add an operation to the completion queue
 	 */
-	void push(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id) {
+	void push(asyncOperation::AsynchronousOperation<T> *operation) {
 		// Lock the queue
 		std::lock_guard<std::mutex> locker(mutex);
 		// Insert the element into the queue

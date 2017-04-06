@@ -16,7 +16,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <unordered_map>
+#include <deque>
 #include "../asyncOperation/AsynchronousOperation.hpp"
 #include "../completionEventQueue/CompletionEventQueue.hpp"
 #include "../logger/Logger.hpp"
@@ -30,49 +30,77 @@ namespace asyncOperationProcessor  {
  * It generates and queues the corresponding completion events.
  */
 template <typename T>
-class AsynchronousOperationProcessor : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
+class AsynchronousOperationProcessor : public observer::Observer<asyncOperation::AsynchronousOperation<T>> {
 private:
+	/**
+	 * Maximum pool size
+	 */
 	size_t poolSize;
+	/**
+	 * Mutex used to control the insertion in the non-completed operations queue
+	 */
 	std::mutex lock;
+	/**
+	 * Condition variable used to control the insertion regarding the queue size
+	 */
 	std::condition_variable cv;
-	bool isWaiting;
-	std::unordered_map<asyncOperation::AsynchronousOperation<T>*, const unsigned int> pool;
-	completionEventQueue::CompletionEventQueue<T> *completionEventQueue;
+	/**
+	 * Pool of non-completed operations
+	 */
+	std::deque<asyncOperation::AsynchronousOperation<T>*> pool;
+	/**
+	 * Pool of completed operations (completed)
+	 */
+	std::shared_ptr<completionEventQueue::CompletionEventQueue<T> > completionEventQueue;
 public:
-	AsynchronousOperationProcessor(size_t poolSize, completionEventQueue::CompletionEventQueue<T> *completionEventQueue) :
-		poolSize(poolSize), isWaiting(false), completionEventQueue(completionEventQueue) {};
+	/**
+	 * Default queue size for the non-completed operations, in case it is not defined
+	 */
+	static const size_t DEFAULT_QUEUE_SIZE = 2;
 
-	virtual ~AsynchronousOperationProcessor() {
-		while (pool.size() != 0) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		}
-		logger::Logger::log("Finished AsynchronousOperationProcessor.");
+	/*
+	 * Class constructor
+	 * @param[in] poolSize				Maximum size of the queue for non-completed operations
+	 * @param[in] completionEventQueue	Queue of processed and completed operations. This parameter is optional (if it
+	 * 									it not defined, the DEFAULT_QUEUE_SIZE is set instead)
+	 */
+	AsynchronousOperationProcessor( std::shared_ptr<completionEventQueue::CompletionEventQueue<T> >& completionEventQueue,
+									const size_t poolSize = DEFAULT_QUEUE_SIZE) :
+										poolSize(poolSize),
+										pool(std::deque<asyncOperation::AsynchronousOperation<T>*>()),
+										completionEventQueue(completionEventQueue) {
 	};
 
-	void addOperation(const unsigned int id, asyncOperation::AsynchronousOperation<T>* operation) {
+	/**
+	 * Class destructor
+	 */
+	virtual ~AsynchronousOperationProcessor() {
+	};
+
+	void addOperation(asyncOperation::AsynchronousOperation<T>* operation) {
 		std::unique_lock<std::mutex> locker(lock);
-		if (pool.size() == poolSize) {
-			isWaiting = true;
-			auto cond = [](size_t a, size_t b) {return a==b;};
-			logger::Logger::log("Wait...");
-			if (cond(pool.size(), poolSize)) {
-				cv.wait(locker);
-			}
-		}
+		if (pool.size() == poolSize)
+			cv.wait(locker, [&]{ return pool.size() < poolSize;});
+
 		operation->setObserver(this);
 		std::thread t = std::thread(&asyncOperation::AsynchronousOperation<T>::execute, operation);
 		t.detach();
-		pool.insert(std::pair<asyncOperation::AsynchronousOperation<T>*,const unsigned int>(operation, id));
+		pool.push_back(operation);
 	};
+
 	void notify(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id=0) {
 		std::unique_lock<std::mutex> locker(lock);
 
-		completionEventQueue->push(operation, pool.at(operation));
-		pool.erase(operation);
+		completionEventQueue->push(operation);
 
-		if (isWaiting) {
+		bool isFull = pool.size() == poolSize;
+		typedef typename std::deque<asyncOperation::AsynchronousOperation<T>*>::iterator iterType;
+		iterType iter = std::find(pool.begin(), pool.end(), operation);
+		if (iter != pool.end())
+			pool.erase(iter);
+
+		if (isFull) {
 			logger::Logger::log("Unlocking for next...");
-			isWaiting = false;
 			cv.notify_one();
 		}
 	};

@@ -59,7 +59,7 @@ public:
 	static std::string dateToString(const std::chrono::system_clock::time_point& start, const std::chrono::system_clock::time_point& end) {
 		std::stringstream oss;
 		oss << dateToString(start);
-		oss << " - elapsed: " << diffTimeToString(start, end);
+		oss << " - elapsed: " << diffTimeToString(start, end) << " ms";
 		return oss.str();
 	}
 
