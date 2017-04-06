@@ -57,9 +57,9 @@ public:
 		logger::Logger::log("Initiating operation... ");
 		asynchronousOperationProcessor->addOperation(operation);
 	};
-	void notify(asyncOperation::AsynchronousOperation<T> *operation, const unsigned int id=0) {
+	void notify(asyncOperation::AsynchronousOperation<T> *operation) {
 		logger::Logger::log("Notified in Initiator/Completion - id:" +
-				utils::Utils::tostr(id) +
+				utils::Utils::tostr(operation->getId()) +
 				" - Result operation: " +
 				utils::Utils::tostr(operation->getResult()));
 	};

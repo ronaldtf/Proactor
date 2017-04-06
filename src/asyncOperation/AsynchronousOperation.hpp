@@ -102,7 +102,7 @@ public:
 		proactor::logger::Logger::log("\tFinished operation ", opId, std::this_thread::get_id(), startTime, endTime);
 		// Notify the observer, if defined
 		if (observer != NULL)
-			observer->notify(this, opId);
+			observer->notify(this);
 	};
 
 	/**

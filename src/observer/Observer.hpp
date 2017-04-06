@@ -21,9 +21,8 @@ public:
 	/**
 	 * Notify the observer
 	 * @param[in] operation	Operation that notifies the observer
-	 * @param[in] opId		Operation identifier that notifies the observer (optional)
 	 */
-	virtual void notify(T* operation, const unsigned int opId=0) = 0;
+	virtual void notify(T* operation) = 0;
 
 	/**
 	 * Class destructor
