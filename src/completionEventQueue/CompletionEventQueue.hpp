@@ -29,11 +29,17 @@ private:
 	 * Lock to push and pop events in the queue
 	 */
 	std::mutex mutex;
+	/**
+	 * Operations which are being processed and which are not terminated. This counter is
+	 * useful because, in case the system needs to be shut down, all the pending operations
+	 * are correctly calculated and finished before the full system terminates
+	 */
+	unsigned int pendingOperations;
 public:
 	/**
 	 * Class constructor
 	 */
-	CompletionEventQueue() : std::deque<asyncOperation::AsynchronousOperation<T>*>() {
+	CompletionEventQueue() : std::deque<asyncOperation::AsynchronousOperation<T>*>(), pendingOperations(0) {
 	};
 
 	/**
@@ -69,6 +75,12 @@ public:
 		std::lock_guard<std::mutex> locker(mutex);
 		// Insert the element into the queue
 		this->push_back(operation);
+
+		// Update the counter of pending operations
+		if (pendingOperations == 0)
+			throw std::exception();
+		--pendingOperations;
+
 	};
 
 	/**
@@ -80,6 +92,24 @@ public:
 		std::lock_guard<std::mutex> locker(mutex);
 		// Return the size of the queue
 		return std::deque<asyncOperation::AsynchronousOperation<T>*>::size();
+	}
+
+	/**
+	 * Increment the number of operations which are being processed but
+	 * not terminated
+	 */
+	void incrementPendingOperations() {
+		std::lock_guard<std::mutex> locker(mutex);
+		++pendingOperations;
+	}
+
+	/**
+	 * Verify whether ther are operations which are waiting to be completed
+	 */
+	bool arePendingOperations() {
+		// We use the lock here to ensure that the counter is not modified
+		std::lock_guard<std::mutex> locker(mutex);
+		return (pendingOperations == 0);
 	}
 };
 

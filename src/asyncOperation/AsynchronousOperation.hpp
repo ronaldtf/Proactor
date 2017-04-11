@@ -81,7 +81,6 @@ public:
 	 * @see Observer
 	 */
 	void setObserver(observer::Observer<AsynchronousOperation<T> >* observer) {
-		proactor::logger::Logger::log("Adding observer... \t\t[operation: " + utils::Utils::tostr(opId) + "]");
 		this->observer = observer;
 	};
 

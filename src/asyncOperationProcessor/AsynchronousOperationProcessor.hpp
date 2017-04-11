@@ -92,6 +92,9 @@ public:
 		// Set this class as the observer of the operation
 		operation->setObserver(this);
 
+		// Update the counter of operations being processed and not terminated
+		completionEventQueue->incrementPendingOperations();
+
 		// Start the operation in a new thread
 		std::thread t = std::thread(&asyncOperation::AsynchronousOperation<T>::execute, operation);
 		t.detach();
