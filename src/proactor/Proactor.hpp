@@ -102,7 +102,7 @@ public:
 			}
 		} // The proactor is called to be finished
 
-		std::cout <<"Proactor execution finished." << std::endl;
+		logger::Logger::log("Proactor execution finished.");
 	};
 
 };
