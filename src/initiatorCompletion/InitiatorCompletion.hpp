@@ -103,8 +103,10 @@ public:
 				utils::Utils::tostr(operation->getId()) +
 				" - Result operation: " +
 				utils::Utils::tostr(operation->getResult()));
+		// NOTE: Add these lines in case you want to avoid that the client removes
+		//       the operation pointers
 		// Remove operation as it was finished
-		delete operation;
+		// delete operation;
 	};
 };
 
