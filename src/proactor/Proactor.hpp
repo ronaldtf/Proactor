@@ -95,7 +95,8 @@ public:
 
 			// In case there are new competed events, notify the observer
 			if (completionEventQueue->size() > 0) {
-				logger::Logger::log("Proactor removes  element from queue (size: " + utils::Utils::tostr(completionEventQueue->size()) + ")...");
+				logger::Logger::log("Proactor removes  element from queue (size: " +
+						utils::Utils::tostr(completionEventQueue->size()) + ")...");
 				asyncOperation::AsynchronousOperation<T>* myoperation = completionEventQueue->pop();
 				observer->notify(myoperation);
 			}

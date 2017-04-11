@@ -103,6 +103,7 @@ public:
 				utils::Utils::tostr(operation->getId()) +
 				" - Result operation: " +
 				utils::Utils::tostr(operation->getResult()));
+		// Remove operation as it was finished
 		delete operation;
 	};
 };
