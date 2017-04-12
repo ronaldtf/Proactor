@@ -1,4 +1,4 @@
-.PHONY: clean
+.PHONY: clean all run
 CC = g++
 CCFLAGS = -Wall -std=c++11
 TARGET = client/Client
@@ -21,3 +21,6 @@ all: clean $(TARGET)
 
 run:	all
 	./$(TARGET)
+
+doxygen:
+	doxygen .doxygen.conf
