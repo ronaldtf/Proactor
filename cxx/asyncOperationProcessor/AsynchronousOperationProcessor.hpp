@@ -31,7 +31,7 @@ namespace asyncOperationProcessor  {
  * the corresponding completion events.
  */
 template <typename T>
-class AsynchronousOperationProcessor : public observer::Observer<asyncOperation::AsynchronousOperation<T>> {
+class AsynchronousOperationProcessor : public observer::Observer<asyncOperation::AsynchronousOperation<T> > {
 private:
 	/**
 	 * Maximum pool size

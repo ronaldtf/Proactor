@@ -1,3 +1,4 @@
-/Debug/
-bin
+**/Debug/
 .settings
+**/*.o
+**/Proactor
