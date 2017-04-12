@@ -13,12 +13,12 @@
 #include <iostream>
 #include <memory>
 
-#include "asyncOperation/AsynchronousOperation.hpp"
-#include "asyncOperation/SumAsynchronousOperation.hpp"
-#include "asyncOperationProcessor/AsynchronousOperationProcessor.hpp"
-#include "initiatorCompletion/InitiatorCompletion.hpp"
-#include "logger/Logger.hpp"
-#include "proactor/Proactor.hpp"
+#include "../asyncOperation/AsynchronousOperation.hpp"
+#include "../asyncOperation/SumAsynchronousOperation.hpp"
+#include "../asyncOperationProcessor/AsynchronousOperationProcessor.hpp"
+#include "../initiatorCompletion/InitiatorCompletion.hpp"
+#include "../logger/Logger.hpp"
+#include "../proactor/Proactor.hpp"
 
 using namespace proactor::asyncOperation;
 
